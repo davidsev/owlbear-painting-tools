@@ -1,0 +1,9 @@
+{
+  "name" : "Drawing Tools",
+  "version" : "DEV",
+  "description" : "Draw cell-by-cell",
+  "manifest_version" : 1,
+  "background_url" : "/frame.html#background",
+  "icon" : "/icon.svg",
+  "homepage_url" : "https://github.com/davidsev/owlbear-drawing"
+}
