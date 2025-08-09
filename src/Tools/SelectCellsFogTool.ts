@@ -4,7 +4,7 @@ import { BaseTool } from './BaseTool';
 import { FogRenderer } from './Renderers/FogRenderer';
 import { SelectCellsShape } from './Shapes/SelectCellsShape';
 
-export class SelectCellsFogTool extends BaseTool {
+export class SelectCellsFogTool extends BaseTool <FogRenderer, SelectCellsShape> {
 
     readonly id: string = getId('highlightCellsFog');
     readonly icons: ToolIcon[] = [{

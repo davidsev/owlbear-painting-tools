@@ -3,14 +3,14 @@ import { ToolContext, ToolEvent } from '@owlbear-rodeo/sdk/lib/types/Tool';
 import { RendererInterface } from './Renderers/RendererInterface';
 import { ShapeInterface } from './Shapes/ShapeInterface';
 
-export abstract class BaseTool implements ToolMode {
+export abstract class BaseTool<RendererType extends RendererInterface, ShapeType extends ShapeInterface> implements ToolMode {
 
     abstract readonly id: string;
     abstract readonly icons: ToolIcon[];
 
     constructor (
-        public readonly renderer: RendererInterface,
-        public readonly shape: ShapeInterface,
+        public readonly renderer: RendererType,
+        public readonly shape: ShapeType,
     ) {}
 
     async onToolDragStart (context: ToolContext, event: ToolEvent): Promise<void> {

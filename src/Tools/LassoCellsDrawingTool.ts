@@ -4,7 +4,7 @@ import { BaseTool } from './BaseTool';
 import { LassoCellsShape } from './Shapes/LassoCellsShape';
 import { DrawingRenderer } from './Renderers/DrawingRenderer';
 
-export class LassoCellsDrawingTool extends BaseTool {
+export class LassoCellsDrawingTool extends BaseTool<DrawingRenderer, LassoCellsShape> {
 
     readonly id: string = getId('lassoCellsDrawing');
     readonly icons: ToolIcon[] = [{

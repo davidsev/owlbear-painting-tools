@@ -4,7 +4,7 @@ import { BaseTool } from './BaseTool';
 import { SelectCellsShape } from './Shapes/SelectCellsShape';
 import { DrawingRenderer } from './Renderers/DrawingRenderer';
 
-export class SelectCellsDrawingTool extends BaseTool {
+export class SelectCellsDrawingTool extends BaseTool<DrawingRenderer, SelectCellsShape> {
 
     readonly id: string = getId('highlightCellsDrawing');
     readonly icons: ToolIcon[] = [{

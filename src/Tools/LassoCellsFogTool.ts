@@ -4,7 +4,7 @@ import { BaseTool } from './BaseTool';
 import { FogRenderer } from './Renderers/FogRenderer';
 import { LassoCellsShape } from './Shapes/LassoCellsShape';
 
-export class LassoCellsFogTool extends BaseTool {
+export class LassoCellsFogTool extends BaseTool <FogRenderer, LassoCellsShape> {
 
     readonly id: string = getId('lassoCellsFog');
     readonly icons: ToolIcon[] = [{
