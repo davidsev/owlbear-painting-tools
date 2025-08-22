@@ -9,6 +9,8 @@ import styles from './UI/baseCSS.css';
 import './UI';
 import { BrushDrawingTool } from './Tools/BrushDrawingTool';
 import { BrushFogTool } from './Tools/BrushFogTool';
+import { LockAllAction } from './LockAll/LockAllAction';
+import { LockActionManager } from './LockAll/LockActionManager';
 
 registerInitFunction('background', async () => {
     return Promise.all([
@@ -18,6 +20,7 @@ registerInitFunction('background', async () => {
         OBR.tool.createMode(new SelectCellsDrawingTool()),
         OBR.tool.createMode(new LassoCellsDrawingTool()),
         OBR.tool.createMode(new BrushDrawingTool()),
+        new LockActionManager(),
     ]);
 });
 

@@ -12,7 +12,7 @@ module.exports = {
         path: path.resolve(__dirname, 'dist'),
         clean: true,
     },
-    devtool: (process.env.NODE_ENV === 'development' ? 'inline-source-map' : false),
+    devtool: (process.env.NODE_ENV === 'development' ? 'eval-source-map' : false),
     module: {
         rules: [
             {
