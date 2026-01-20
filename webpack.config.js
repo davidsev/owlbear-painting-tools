@@ -53,6 +53,7 @@ module.exports = {
                 },
                 {
                     from: 'static/manifest.json',
+                    force: true,
                     transform: (content, path) => {
                         let manifest = JSON.parse(content.toString());
                         manifest.version = version;
