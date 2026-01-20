@@ -14,11 +14,12 @@ learn-more: https://github.com/davidsev/owlbear-drawing-tools
 
 # Drawing Tools
 
-This extension adds three new tools for both drawing and fog:
+This extension adds four new tools for both drawing and fog:
 
 - A "select cells" tool that outlines selected squares / hexes
 - A "lasso" tool that draws around a bunch of squares / hexes outline them all
 - A "paint brush" tool that lets you scribble on the map
+- A "lock all" button to lock / unlock all drawings.
 
 ### Other
 
