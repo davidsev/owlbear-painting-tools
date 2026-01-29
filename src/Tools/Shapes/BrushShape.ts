@@ -127,14 +127,17 @@ export class BrushShape implements ShapeInterface {
             return;
 
         this._inUpdate = true;
-        await OBR.scene.local.updateItems([this.cursor.id], ([cursor]) => {
-            if (isShape(cursor)) {
-                cursor.position = point;
-                cursor.width = this.radius * 2;
-                cursor.height = this.radius * 2;
-            }
-        });
-        this._inUpdate = false;
+        try {
+            await OBR.scene.local.updateItems([this.cursor.id], ([cursor]) => {
+                if (isShape(cursor)) {
+                    cursor.position = point;
+                    cursor.width = this.radius * 2;
+                    cursor.height = this.radius * 2;
+                }
+            });
+        } finally {
+            this._inUpdate = false;
+        }
     }
 }
 
