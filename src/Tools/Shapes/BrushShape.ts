@@ -125,8 +125,6 @@ export class BrushShape implements ShapeInterface {
         if (!this.cursor || this._inUpdate)
             return;
 
-        console.log(this.radius);
-
         this._inUpdate = true;
         await OBR.scene.local.updateItems([this.cursor.id], ([cursor]) => {
             if (isShape(cursor)) {
