@@ -36,7 +36,7 @@ module.exports = {
     },
     plugins: [
         new HtmlWebpackPlugin({
-            title: 'Drawing Tools',
+            title: 'Painting Tools',
             filename: 'frame.html',
         }),
         new DefinePlugin({

@@ -1,4 +1,4 @@
-export const baseId = 'uk.co.davidsev.owlbear.drawing-tools';
+export const baseId = 'uk.co.davidsev.owlbear.painting-tools';
 
 export default function getId (id ?: string): string {
     if (id)

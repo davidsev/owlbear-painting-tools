@@ -30,7 +30,7 @@ jobs:
         run: npm ci
       - name: Build
         env:
-          URL_PREFIX: https://drawing-tools.owlbear.davidsev.co.uk/${{ github.ref_name }}
+          URL_PREFIX: https://painting-tools.owlbear.davidsev.co.uk/${{ github.ref_name }}
         run: npm run prod
       ######
       # Login to AWS

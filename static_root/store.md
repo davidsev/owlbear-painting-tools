@@ -1,18 +1,18 @@
 ---
-title: Drawing Tools
+title: Painting Tools
 description: More tools to draw stuff.
 author: David Severwright
-image: https://drawing-tools.owlbear.davidsev.co.uk/banner.png
-icon: https://drawing-tools.owlbear.davidsev.co.uk/icon.svg
+image: https://painting-tools.owlbear.davidsev.co.uk/banner.png
+icon: https://painting-tools.owlbear.davidsev.co.uk/icon.svg
 tags:
     - fog
     - drawing
     - tool
-manifest: https://drawing-tools.owlbear.davidsev.co.uk/manifest.json
-learn-more: https://github.com/davidsev/owlbear-drawing-tools
+manifest: https://painting-tools.owlbear.davidsev.co.uk/manifest.json
+learn-more: https://github.com/davidsev/owlbear-painting-tools
 ---
 
-# Drawing Tools
+# Painting Tools
 
 This extension adds four new tools for both drawing and fog:
 
@@ -23,5 +23,5 @@ This extension adds four new tools for both drawing and fog:
 
 ### Other
 
-- The code is on [GitHub](https://github.com/davidsev/owlbear-drawing-tools)
+- The code is on [GitHub](https://github.com/davidsev/owlbear-painting-tools)
 
