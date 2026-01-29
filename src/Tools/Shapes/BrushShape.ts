@@ -111,9 +111,10 @@ export class BrushShape implements ShapeInterface {
         await OBR.scene.local.addItems([this.cursor]);
     }
 
-    // Not async, as soon as the delete is sent we don't care any more.
     public hideCursor (): void {
         if (this.cursor) {
+            // We don't handle this promise because we don't care if the cursor is deleted successfully.
+            // On success there's nothing to do, and if it fails there's nothing we can do.  It's a local item so will clean itself up on refresh.
             OBR.scene.local.deleteItems([this.cursor.id]);
             this.cursor = null;
         }
