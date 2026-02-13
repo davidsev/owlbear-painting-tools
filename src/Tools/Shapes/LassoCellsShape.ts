@@ -6,11 +6,12 @@ import { cellInPoly } from '../../Utils/cellInPoly';
 import { skiaPathToObrPath } from '../../Utils/skiaPathToObrPath';
 import { ShapeInterface } from './ShapeInterface';
 import { awaitCanvasKit } from '../../Utils/awaitCanvasKit';
+import { addCellsToPath } from '../../Utils/cellsToPath';
 
 export class LassoCellsShape implements ShapeInterface {
 
     private points: Point[] = [];
-    private cells: Map<String, Cell> = new Map();
+    private cells: Map<string, Cell> = new Map();
 
     public async add (point: Vector2): Promise<void> {
         this.points.push(new Point(point));
@@ -47,15 +48,7 @@ export class LassoCellsShape implements ShapeInterface {
         // Merge the cells.
         const canvasKit = await awaitCanvasKit();
         const newShape = new canvasKit.Path();
-        for (const cell of cells.values()) {
-            for (const [i, point] of cell.corners.entries()) {
-                if (i === 0)
-                    newShape.moveTo(point.x, point.y);
-                else
-                    newShape.lineTo(point.x, point.y);
-            }
-            newShape.close();
-        }
+        addCellsToPath(cells, newShape);
 
         newShape.simplify();
 
@@ -71,4 +64,3 @@ export class LassoCellsShape implements ShapeInterface {
         return commands;
     }
 }
-

@@ -3,6 +3,7 @@ import { Cell, grid } from '@davidsev/owlbear-utils';
 import { skiaPathToObrPath } from '../../Utils/skiaPathToObrPath';
 import { ShapeInterface } from './ShapeInterface';
 import { awaitCanvasKit } from '../../Utils/awaitCanvasKit';
+import { addCellsToPath } from '../../Utils/cellsToPath';
 
 export class SelectCellsShape implements ShapeInterface {
 
@@ -23,15 +24,7 @@ export class SelectCellsShape implements ShapeInterface {
         const canvasKit = await awaitCanvasKit();
 
         const newShape = new canvasKit.Path();
-        for (const cell of this.cells.values()) {
-            for (const [i, point] of cell.corners.entries()) {
-                if (i === 0)
-                    newShape.moveTo(point.x, point.y);
-                else
-                    newShape.lineTo(point.x, point.y);
-            }
-            newShape.close();
-        }
+        addCellsToPath(this.cells.values(), newShape);
 
         newShape.simplify();
 

@@ -1,13 +1,11 @@
-import OBR, { buildPath, isPath, Item, Path } from '@owlbear-rodeo/sdk';
+import OBR, { buildPath } from '@owlbear-rodeo/sdk';
 import { grid } from '@davidsev/owlbear-utils';
-import { RendererInterface } from './RendererInterface';
+import { BaseRenderer } from './BaseRenderer';
 import { ShapeInterface } from '../Shapes/ShapeInterface';
 import { drawingToolMetadata } from '../../Metadata/DrawingToolMetadata';
+import { getGridColor } from '../../Utils/getGridColor';
 
-export class DrawingRenderer implements RendererInterface {
-
-    private path?: Path;
-    private guidePath?: Item;
+export class DrawingRenderer extends BaseRenderer {
 
     public async startPreview (shape: ShapeInterface): Promise<void> {
         this.removePreview();
@@ -34,12 +32,7 @@ export class DrawingRenderer implements RendererInterface {
             .build();
 
         if (guidePathCommands) {
-            // Get the grid colour to use for the guide path.
-            const colour = {
-                'LIGHT': '#FFFFFF',
-                'DARK': '#000000',
-                'HIGHLIGHT': '#FA6400',
-            }[grid.style.lineColor] || grid.style.lineColor;
+            const colour = getGridColor(grid.style.lineColor);
             this.guidePath = buildPath()
                 .strokeColor(colour)
                 .position({ x: 0, y: 0 })
@@ -56,44 +49,6 @@ export class DrawingRenderer implements RendererInterface {
             OBR.scene.local.addItems([this.path]),
             this.guidePath ? OBR.scene.local.addItems([this.guidePath]) : Promise.resolve(),
         ]);
-    }
-
-    public async updatePreview (shape: ShapeInterface): Promise<void> {
-
-        const [pathCommands, guidePathCommands] = await Promise.all([
-            shape.getPathCommands(),
-            shape.getGuidePathCommands(),
-        ]);
-
-        const promises = [];
-        if (this.path) {
-            promises.push(OBR.scene.local.updateItems([this.path.id], ([path]) => {
-                if (isPath(path))
-                    path.commands = pathCommands;
-            }));
-        }
-        if (this.guidePath) {
-            promises.push(OBR.scene.local.updateItems([this.guidePath.id], ([path]) => {
-                if (isPath(path))
-                    path.commands = guidePathCommands || [];
-            }));
-        }
-
-        await Promise.all(promises);
-    }
-
-    public async removePreview (): Promise<void> {
-        const promises = [];
-        if (this.path) {
-            promises.push(OBR.scene.local.deleteItems([this.path.id]));
-            this.path = undefined;
-        }
-        if (this.guidePath) {
-            promises.push(OBR.scene.local.deleteItems([this.guidePath.id]));
-            this.guidePath = undefined;
-        }
-
-        await Promise.all(promises);
     }
 
     public async saveFinalShape (shape: ShapeInterface): Promise<void> {
