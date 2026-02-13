@@ -49,7 +49,7 @@ export class LassoCellsShape implements ShapeInterface {
         const newShape = new canvasKit.Path();
         for (const cell of cells.values()) {
             for (const [i, point] of cell.corners.entries()) {
-                if (i == 0)
+                if (i === 0)
                     newShape.moveTo(point.x, point.y);
                 else
                     newShape.lineTo(point.x, point.y);

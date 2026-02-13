@@ -6,7 +6,7 @@ import { awaitCanvasKit } from '../../Utils/awaitCanvasKit';
 
 export class SelectCellsShape implements ShapeInterface {
 
-    private cells: Map<String, Cell> = new Map();
+    private cells: Map<string, Cell> = new Map();
 
     public async add (point: Vector2): Promise<void> {
         const cell = grid.getCell(point);
@@ -25,7 +25,7 @@ export class SelectCellsShape implements ShapeInterface {
         const newShape = new canvasKit.Path();
         for (const cell of this.cells.values()) {
             for (const [i, point] of cell.corners.entries()) {
-                if (i == 0)
+                if (i === 0)
                     newShape.moveTo(point.x, point.y);
                 else
                     newShape.lineTo(point.x, point.y);

@@ -24,6 +24,7 @@ CanvasKitInit()
         canvasKit = ck;
         for (const { resolve } of promises)
             resolve(ck);
+        promises.length = 0;
     })
     .catch((error) => {
         loadError = error;

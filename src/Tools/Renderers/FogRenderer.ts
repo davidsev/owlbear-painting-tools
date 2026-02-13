@@ -91,7 +91,10 @@ export class FogRenderer implements RendererInterface {
     }
 
     public async saveFinalShape (shape: ShapeInterface): Promise<void> {
-        const fogMetadata = await OBR.tool.getMetadata('rodeo.owlbear.tool/fog');
+        const [pathCommands, fogMetadata] = await Promise.all([
+            shape.getPathCommands(),
+            OBR.tool.getMetadata('rodeo.owlbear.tool/fog'),
+        ]);
         const cut = !!fogMetadata?.cut;
 
         await OBR.scene.items.addItems([buildPath()
@@ -101,7 +104,7 @@ export class FogRenderer implements RendererInterface {
             .fillColor('#222222')
             .strokeColor('#222222')
             .visible(!cut)
-            .commands(await shape.getPathCommands())
+            .commands(pathCommands)
             .build(),
         ]);
     }

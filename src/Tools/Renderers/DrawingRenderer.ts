@@ -112,7 +112,7 @@ export class DrawingRenderer implements RendererInterface {
             .fillOpacity(drawingMetadata.fillOpacity)
             .fillColor(drawingMetadata.fillColor)
             .fillRule('evenodd')
-            .commands(await shape.getPathCommands())
+            .commands(pathCommands)
             .build(),
         ]);
     }
