@@ -43,11 +43,13 @@ export class BrushShape implements ShapeInterface {
                 newShape.close();
             }
             this.path.op(newShape, canvasKit.PathOp.Union);
+            newShape.delete();
         }
     }
 
     public async clear (): Promise<void> {
         this.points = [];
+        this.path?.delete();
         this.path = null;
     }
 

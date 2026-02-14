@@ -28,7 +28,9 @@ export class SelectCellsShape implements ShapeInterface {
 
         newShape.simplify();
 
-        return skiaPathToObrPath(newShape.toCmds());
+        const cmds = skiaPathToObrPath(newShape.toCmds());
+        newShape.delete();
+        return cmds;
     }
 
     public async getGuidePathCommands (): Promise<null> {
