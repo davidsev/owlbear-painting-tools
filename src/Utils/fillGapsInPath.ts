@@ -1,4 +1,4 @@
-import { Point } from '@davidsev/owlbear-utils';
+import type { Point } from '@davidsev/owlbear-utils';
 
 export function fillGapsInPath (points: Point[], maxDistance: number): Point[] {
     if (points.length <= 1 || maxDistance <= 0) {

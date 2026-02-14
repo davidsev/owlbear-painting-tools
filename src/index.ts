@@ -1,15 +1,15 @@
-import { registerInitFunction } from './init';
 import OBR from '@owlbear-rodeo/sdk';
-import { SelectCellsFogTool } from './Tools/SelectCellsFogTool';
+import { registerInitFunction } from './init';
+import { LassoCellsDrawingTool } from './Tools/LassoCellsDrawingTool';
 import { LassoCellsFogTool } from './Tools/LassoCellsFogTool';
 import { SelectCellsDrawingTool } from './Tools/SelectCellsDrawingTool';
-import { LassoCellsDrawingTool } from './Tools/LassoCellsDrawingTool';
-import { BrushSizeForm } from './UI/Forms/BrushSizeForm';
+import { SelectCellsFogTool } from './Tools/SelectCellsFogTool';
 import styles from './UI/baseCSS.css';
+import { BrushSizeForm } from './UI/Forms/BrushSizeForm';
 import './UI';
+import { LockActionManager } from './LockAll/LockActionManager';
 import { BrushDrawingTool } from './Tools/BrushDrawingTool';
 import { BrushFogTool } from './Tools/BrushFogTool';
-import { LockActionManager } from './LockAll/LockActionManager';
 
 registerInitFunction('background', async () => {
     new LockActionManager();

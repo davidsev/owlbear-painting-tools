@@ -1,7 +1,7 @@
 import OBR from '@owlbear-rodeo/sdk';
+import { lockSceneMetadata } from '../Metadata/LockSceneMetadata';
 import { LockAllAction } from './LockAllAction';
 import { UnlockAllAction } from './UnlockAllAction';
-import { lockSceneMetadata } from '../Metadata/LockSceneMetadata';
 
 export class LockActionManager {
 

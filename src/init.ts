@@ -1,8 +1,9 @@
 import { grid } from '@davidsev/owlbear-utils';
 
-let functions: Map<string, Function> = new Map<string, Function>();
+type InitFunction = () => unknown;
+const functions: Map<string, InitFunction> = new Map<string, InitFunction>();
 
-export function registerInitFunction (name: string, callback: Function) {
+export function registerInitFunction (name: string, callback: InitFunction) {
     functions.set(name, callback);
 }
 

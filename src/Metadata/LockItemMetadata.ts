@@ -1,5 +1,5 @@
-import getId from '../Utils/getId';
 import { ItemMetadataMapper } from '@davidsev/owlbear-utils';
+import getId from '../Utils/getId';
 
 export class LockItemMetadata {
     isLocked: boolean = false;

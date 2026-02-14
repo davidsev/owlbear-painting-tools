@@ -1,4 +1,4 @@
-import CanvasKitInit, { CanvasKit } from 'canvaskit-wasm';
+import CanvasKitInit, { type CanvasKit } from 'canvaskit-wasm';
 
 let canvasKit: CanvasKit | null = null;
 let loadError: Error | null = null;

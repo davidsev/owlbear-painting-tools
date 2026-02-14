@@ -1,14 +1,14 @@
-import { ToolIcon } from '@owlbear-rodeo/sdk';
+import type { ToolIcon } from '@owlbear-rodeo/sdk';
 import getId from '../Utils/getId';
 import { BaseTool } from './BaseTool';
-import { SelectCellsShape } from './Shapes/SelectCellsShape';
 import { DrawingRenderer } from './Renderers/DrawingRenderer';
+import { SelectCellsShape } from './Shapes/SelectCellsShape';
 
 export class SelectCellsDrawingTool extends BaseTool<DrawingRenderer, SelectCellsShape> {
 
     readonly id: string = getId('highlightCellsDrawing');
     readonly icons: ToolIcon[] = [{
-        icon: URL_PREFIX + '/selectCells.svg',
+        icon: `${URL_PREFIX}/selectCells.svg`,
         label: 'Select Cells',
         filter: {
             activeTools: ['rodeo.owlbear.tool/drawing'],

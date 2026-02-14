@@ -1,4 +1,4 @@
-import { Command, PathCommand } from '@owlbear-rodeo/sdk';
+import { Command, type PathCommand } from '@owlbear-rodeo/sdk';
 
 export function skiaPathToObrPath (skiaCmds: Float32Array): PathCommand[] {
 
@@ -28,7 +28,7 @@ export function skiaPathToObrPath (skiaCmds: Float32Array): PathCommand[] {
                 i += 7;
                 break;
             default:
-                throw new Error('Unknown skPath command: ' + skiaCmds[i]);
+                throw new Error(`Unknown skPath command: ${skiaCmds[i]}`);
         }
     }
 

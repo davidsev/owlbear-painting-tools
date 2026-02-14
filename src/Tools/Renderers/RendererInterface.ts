@@ -1,4 +1,4 @@
-import { ShapeInterface } from '../Shapes/ShapeInterface';
+import type { ShapeInterface } from '../Shapes/ShapeInterface';
 
 export interface RendererInterface {
 

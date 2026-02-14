@@ -1,8 +1,8 @@
-import { customElement, query } from 'lit/decorators.js';
 import { html } from 'lit';
+import { customElement, query } from 'lit/decorators.js';
 import { BaseElement } from '../BaseElement';
-import style from './BrushSizeForm.css';
 import { baseCSS } from '../baseCSS';
+import style from './BrushSizeForm.css';
 
 @customElement('brush-size-form')
 export class BrushSizeForm extends BaseElement {
@@ -22,7 +22,7 @@ export class BrushSizeForm extends BaseElement {
     }
 
     private barChanged () {
-        localStorage.setItem('brushRadius', (Math.pow(this.input.valueAsNumber, 2) / 2).toString());
+        localStorage.setItem('brushRadius', (this.input.valueAsNumber ** 2 / 2).toString());
     }
 }
 

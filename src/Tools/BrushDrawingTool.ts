@@ -1,15 +1,15 @@
-import { ToolIcon } from '@owlbear-rodeo/sdk';
+import type { ToolIcon } from '@owlbear-rodeo/sdk';
+import type { ToolContext, ToolEvent } from '@owlbear-rodeo/sdk/lib/types/Tool';
 import getId from '../Utils/getId';
 import { BaseTool } from './BaseTool';
 import { DrawingRenderer } from './Renderers/DrawingRenderer';
 import { BrushShape } from './Shapes/BrushShape';
-import { ToolContext, ToolEvent } from '@owlbear-rodeo/sdk/lib/types/Tool';
 
 export class BrushDrawingTool extends BaseTool<DrawingRenderer, BrushShape> {
 
     readonly id: string = getId('brushDrawing');
     readonly icons: ToolIcon[] = [{
-        icon: URL_PREFIX + '/brush.svg',
+        icon: `${URL_PREFIX}/brush.svg`,
         label: 'Brush',
         filter: {
             activeTools: ['rodeo.owlbear.tool/drawing'],
@@ -34,7 +34,7 @@ export class BrushDrawingTool extends BaseTool<DrawingRenderer, BrushShape> {
         await this.shape.hideSettingsPopup();
     }
 
-    public onToolMove (context: ToolContext, event: ToolEvent): void {
+    public onToolMove (_context: ToolContext, event: ToolEvent): void {
         this.shape.updateCursor(event.pointerPosition);
     }
 }

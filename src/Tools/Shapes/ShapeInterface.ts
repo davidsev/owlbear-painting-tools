@@ -1,4 +1,4 @@
-import { PathCommand, Vector2 } from '@owlbear-rodeo/sdk';
+import type { PathCommand, Vector2 } from '@owlbear-rodeo/sdk';
 
 export interface ShapeInterface {
 

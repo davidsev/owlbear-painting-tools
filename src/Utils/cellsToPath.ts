@@ -1,5 +1,5 @@
-import { Cell } from '@davidsev/owlbear-utils';
-import { Path } from 'canvaskit-wasm';
+import type { Cell } from '@davidsev/owlbear-utils';
+import type { Path } from 'canvaskit-wasm';
 
 export function addCellsToPath (cells: Iterable<Cell>, path: Path): void {
     for (const cell of cells) {

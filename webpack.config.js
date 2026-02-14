@@ -1,4 +1,4 @@
-const path = require('path');
+const path = require('node:path');
 const CopyPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const DefinePlugin = require('webpack').DefinePlugin;
@@ -12,7 +12,7 @@ module.exports = {
         path: path.resolve(__dirname, 'dist'),
         clean: true,
     },
-    devtool: (process.env.NODE_ENV === 'development' ? 'eval-source-map' : false),
+    devtool: process.env.NODE_ENV === 'development' ? 'eval-source-map' : false,
     module: {
         rules: [
             {
@@ -32,7 +32,7 @@ module.exports = {
             buffer: false,
             fs: false,
             path: false,
-        }
+        },
     },
     plugins: [
         new HtmlWebpackPlugin({
@@ -49,13 +49,13 @@ module.exports = {
                     from: 'static',
                 },
                 {
-                    from: 'node_modules/canvaskit-wasm/bin/canvaskit.wasm'
+                    from: 'node_modules/canvaskit-wasm/bin/canvaskit.wasm',
                 },
                 {
                     from: 'static/manifest.json',
                     force: true,
-                    transform: (content, path) => {
-                        let manifest = JSON.parse(content.toString());
+                    transform: (content, _path) => {
+                        const manifest = JSON.parse(content.toString());
                         manifest.version = version;
                         const url_prefix = process.env.URL_PREFIX || '';
                         manifest.background_url = url_prefix + manifest.background_url;
@@ -63,7 +63,7 @@ module.exports = {
                         return JSON.stringify(manifest, null, 4);
                     },
                 },
-            ]
+            ],
         }),
     ],
     devServer: {
@@ -71,5 +71,4 @@ module.exports = {
             'Access-Control-Allow-Origin': '*',
         },
     },
-
 };

@@ -1,6 +1,6 @@
-import OBR, { isPath, Item, Path } from '@owlbear-rodeo/sdk';
-import { RendererInterface } from './RendererInterface';
-import { ShapeInterface } from '../Shapes/ShapeInterface';
+import OBR, { type Item, isPath, type Path } from '@owlbear-rodeo/sdk';
+import type { ShapeInterface } from '../Shapes/ShapeInterface';
+import type { RendererInterface } from './RendererInterface';
 
 export abstract class BaseRenderer implements RendererInterface {
 

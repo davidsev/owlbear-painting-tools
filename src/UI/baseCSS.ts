@@ -3,6 +3,6 @@ import baseStyle from './baseCSS.css';
 
 export function baseCSS (css?: string) {
     return [
-        unsafeCSS(baseStyle + (css ? '\n' + css : '')),
+        unsafeCSS(baseStyle + (css ? `\n${css}` : '')),
     ];
 }

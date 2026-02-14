@@ -1,9 +1,9 @@
-import OBR, { buildPath } from '@owlbear-rodeo/sdk';
 import { grid } from '@davidsev/owlbear-utils';
-import { BaseRenderer } from './BaseRenderer';
-import { ShapeInterface } from '../Shapes/ShapeInterface';
+import OBR, { buildPath } from '@owlbear-rodeo/sdk';
 import { drawingToolMetadata } from '../../Metadata/DrawingToolMetadata';
 import { getGridColor } from '../../Utils/getGridColor';
+import type { ShapeInterface } from '../Shapes/ShapeInterface';
+import { BaseRenderer } from './BaseRenderer';
 
 export class DrawingRenderer extends BaseRenderer {
 

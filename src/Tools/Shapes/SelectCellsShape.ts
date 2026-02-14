@@ -1,9 +1,9 @@
-import { PathCommand, Vector2 } from '@owlbear-rodeo/sdk';
-import { Cell, grid } from '@davidsev/owlbear-utils';
-import { skiaPathToObrPath } from '../../Utils/skiaPathToObrPath';
-import { ShapeInterface } from './ShapeInterface';
+import { type Cell, grid } from '@davidsev/owlbear-utils';
+import type { PathCommand, Vector2 } from '@owlbear-rodeo/sdk';
 import { awaitCanvasKit } from '../../Utils/awaitCanvasKit';
 import { addCellsToPath } from '../../Utils/cellsToPath';
+import { skiaPathToObrPath } from '../../Utils/skiaPathToObrPath';
+import type { ShapeInterface } from './ShapeInterface';
 
 export class SelectCellsShape implements ShapeInterface {
 

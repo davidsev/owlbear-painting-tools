@@ -1,11 +1,11 @@
-import { Cell, Point } from '@davidsev/owlbear-utils';
+import type { Cell, Point } from '@davidsev/owlbear-utils';
 
 // Taken from https://wrfranklin.org/Research/Short_Notes/pnpoly.html
 export function pointInPoly (test: Point, points: Point[]): boolean {
     let inPoly = false;
 
     for (let i = 0, j = points.length - 1; i < points.length; j = i++) {
-        if (((points[i].y > test.y) != (points[j].y > test.y)) &&
+        if (((points[i].y > test.y) !== (points[j].y > test.y)) &&
             (test.x < (points[j].x - points[i].x) * (test.y - points[i].y) / (points[j].y - points[i].y) + points[i].x))
             inPoly = !inPoly;
     }

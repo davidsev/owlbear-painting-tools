@@ -1,10 +1,10 @@
-import OBR, { buildShape, isShape, PathCommand, Shape, Vector2 } from '@owlbear-rodeo/sdk';
-import { ShapeInterface } from './ShapeInterface';
-import getId from '../../Utils/getId';
 import { grid, Point } from '@davidsev/owlbear-utils';
-import { Path } from 'canvaskit-wasm';
+import OBR, { buildShape, isShape, type PathCommand, type Shape, type Vector2 } from '@owlbear-rodeo/sdk';
+import type { Path } from 'canvaskit-wasm';
 import { awaitCanvasKit } from '../../Utils/awaitCanvasKit';
+import getId from '../../Utils/getId';
 import { skiaPathToObrPath } from '../../Utils/skiaPathToObrPath';
+import type { ShapeInterface } from './ShapeInterface';
 
 export class BrushShape implements ShapeInterface {
 
@@ -69,7 +69,7 @@ export class BrushShape implements ShapeInterface {
     public async showSettingsPopup (): Promise<void> {
         await OBR.popover.open({
             id: getId('brush-settings'),
-            url: URL_PREFIX + '/frame.html#brush-settings',
+            url: `${URL_PREFIX}/frame.html#brush-settings`,
             height: 40,
             width: 250,
             disableClickAway: true,

@@ -1,4 +1,4 @@
-import { ToolIcon } from '@owlbear-rodeo/sdk';
+import type { ToolIcon } from '@owlbear-rodeo/sdk';
 import getId from '../Utils/getId';
 import { BaseTool } from './BaseTool';
 import { FogRenderer } from './Renderers/FogRenderer';
@@ -8,7 +8,7 @@ export class SelectCellsFogTool extends BaseTool <FogRenderer, SelectCellsShape>
 
     readonly id: string = getId('highlightCellsFog');
     readonly icons: ToolIcon[] = [{
-        icon: URL_PREFIX + '/selectCells.svg',
+        icon: `${URL_PREFIX}/selectCells.svg`,
         label: 'Select Cells',
         filter: {
             activeTools: ['rodeo.owlbear.tool/fog'],

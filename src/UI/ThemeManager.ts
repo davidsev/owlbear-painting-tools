@@ -1,5 +1,5 @@
 import { awaitScene } from '@davidsev/owlbear-utils/js/awaitScene';
-import OBR, { Theme } from '@owlbear-rodeo/sdk';
+import OBR, { type Theme } from '@owlbear-rodeo/sdk';
 import { TypedEventTarget } from 'typescript-event-target';
 
 interface EventMap {

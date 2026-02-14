@@ -1,12 +1,12 @@
-import { Command, PathCommand, Vector2 } from '@owlbear-rodeo/sdk';
-import { Cell, grid, Point } from '@davidsev/owlbear-utils';
+import { type Cell, grid, Point } from '@davidsev/owlbear-utils';
+import { Command, type PathCommand, type Vector2 } from '@owlbear-rodeo/sdk';
 import simplify from 'simplify-js';
-import { fillGapsInPath } from '../../Utils/fillGapsInPath';
-import { cellInPoly } from '../../Utils/cellInPoly';
-import { skiaPathToObrPath } from '../../Utils/skiaPathToObrPath';
-import { ShapeInterface } from './ShapeInterface';
 import { awaitCanvasKit } from '../../Utils/awaitCanvasKit';
+import { cellInPoly } from '../../Utils/cellInPoly';
 import { addCellsToPath } from '../../Utils/cellsToPath';
+import { fillGapsInPath } from '../../Utils/fillGapsInPath';
+import { skiaPathToObrPath } from '../../Utils/skiaPathToObrPath';
+import type { ShapeInterface } from './ShapeInterface';
 
 export class LassoCellsShape implements ShapeInterface {
 
