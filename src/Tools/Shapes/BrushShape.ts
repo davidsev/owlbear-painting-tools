@@ -1,8 +1,7 @@
 import { grid, Point } from '@davidsev/owlbear-utils';
-import OBR, { buildShape, isShape, type PathCommand, type Shape, type Vector2 } from '@owlbear-rodeo/sdk';
+import type { PathCommand, Vector2 } from '@owlbear-rodeo/sdk';
 import type { Path } from 'canvaskit-wasm';
 import { awaitCanvasKit } from '../../Utils/awaitCanvasKit';
-import getId from '../../Utils/getId';
 import { skiaPathToObrPath } from '../../Utils/skiaPathToObrPath';
 import type { ShapeInterface } from './ShapeInterface';
 
@@ -10,6 +9,10 @@ export class BrushShape implements ShapeInterface {
 
     private points: Point[] = [];
     private path: Path | null = null;
+
+    public get radius (): number {
+        return parseFloat(localStorage.getItem('brushRadius') || '0.25') * 2 * grid.dpi;
+    }
 
     public async add (point: Vector2): Promise<void> {
 
@@ -62,84 +65,6 @@ export class BrushShape implements ShapeInterface {
 
     public async getGuidePathCommands (): Promise<PathCommand[] | null> {
         return null;
-    }
-
-    //
-    // Settings form
-    //
-
-    public async showSettingsPopup (): Promise<void> {
-        await OBR.popover.open({
-            id: getId('brush-settings'),
-            url: `${URL_PREFIX}/frame.html#brush-settings`,
-            height: 40,
-            width: 250,
-            disableClickAway: true,
-            anchorOrigin: {
-                horizontal: 'CENTER',
-                vertical: 'TOP',
-            },
-            marginThreshold: 56,
-        });
-    }
-
-    public async hideSettingsPopup (): Promise<void> {
-        await OBR.popover.close(getId('brush-settings'));
-    }
-
-    //
-    // Cursor
-    //
-
-    private cursor: Shape | null = null;
-
-    private get radius (): number {
-        return parseFloat(localStorage.getItem('brushRadius') || '0.25') * 2 * grid.dpi;
-    }
-
-    public async showCursor (): Promise<void> {
-        if (this.cursor)
-            this.hideCursor();
-
-        this.cursor = buildShape()
-            .strokeColor('#AAAAAA')
-            .fillOpacity(0)
-            .strokeWidth(3)
-            .disableHit(true)
-            .layer('POPOVER')
-            .shapeType('CIRCLE')
-            .build();
-
-        await OBR.scene.local.addItems([this.cursor]);
-    }
-
-    public hideCursor (): void {
-        if (this.cursor) {
-            // We don't handle this promise because we don't care if the cursor is deleted successfully.
-            // On success there's nothing to do, and if it fails there's nothing we can do.  It's a local item so will clean itself up on refresh.
-            OBR.scene.local.deleteItems([this.cursor.id]);
-            this.cursor = null;
-        }
-    }
-
-    private _inUpdate: boolean = false;
-
-    public async updateCursor (point: Vector2): Promise<void> {
-        if (!this.cursor || this._inUpdate)
-            return;
-
-        this._inUpdate = true;
-        try {
-            await OBR.scene.local.updateItems([this.cursor.id], ([cursor]) => {
-                if (isShape(cursor)) {
-                    cursor.position = point;
-                    cursor.width = this.radius * 2;
-                    cursor.height = this.radius * 2;
-                }
-            });
-        } finally {
-            this._inUpdate = false;
-        }
     }
 }
 

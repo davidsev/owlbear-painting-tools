@@ -1,11 +1,9 @@
 import type { ToolIcon } from '@owlbear-rodeo/sdk';
-import type { ToolContext, ToolEvent } from '@owlbear-rodeo/sdk/lib/types/Tool';
 import getId from '../Utils/getId';
-import { BaseTool } from './BaseTool';
+import { BaseBrushTool } from './BaseBrushTool';
 import { DrawingRenderer } from './Renderers/DrawingRenderer';
-import { BrushShape } from './Shapes/BrushShape';
 
-export class BrushDrawingTool extends BaseTool<DrawingRenderer, BrushShape> {
+export class BrushDrawingTool extends BaseBrushTool<DrawingRenderer> {
 
     readonly id: string = getId('brushDrawing');
     readonly icons: ToolIcon[] = [{
@@ -17,24 +15,6 @@ export class BrushDrawingTool extends BaseTool<DrawingRenderer, BrushShape> {
     }];
 
     constructor () {
-        super(new DrawingRenderer(), new BrushShape());
-    }
-
-    // When the tool is activated, show the settings popup and the cursor.
-    public async onActivate (): Promise<void> {
-        await Promise.all([
-            this.shape.showSettingsPopup(),
-            this.shape.showCursor(),
-        ]);
-    }
-
-    // When the tool is deactivated, hide the settings popup and the cursor.
-    public async onDeactivate (): Promise<void> {
-        this.shape.hideCursor();
-        await this.shape.hideSettingsPopup();
-    }
-
-    public onToolMove (_context: ToolContext, event: ToolEvent): void {
-        this.shape.updateCursor(event.pointerPosition);
+        super(new DrawingRenderer());
     }
 }
