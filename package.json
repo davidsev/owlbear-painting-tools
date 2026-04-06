@@ -1,8 +1,9 @@
 {
   "version": "0.7.0",
+  "private": true,
   "scripts": {
     "serve": "URL_PREFIX=http://localhost:8091 webpack-dev-server --config-node-env=development --port 8091 --hot",
-    "prod": "webpack --config-node-env=production",
+    "build": "webpack --config-node-env=production",
     "typecheck": "tsc --noEmit",
     "check": "biome check",
     "check:fix": "biome check --write",
@@ -13,6 +14,9 @@
   "author": "",
   "license": "GPL-3.0-or-later",
   "description": "",
+  "engines": {
+    "node": ">=24"
+  },
   "devDependencies": {
     "@biomejs/biome": "^2.3.15",
     "autoprefixer": "^10.4.20",

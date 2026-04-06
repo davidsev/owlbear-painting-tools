@@ -12,7 +12,9 @@ module.exports = {
         path: path.resolve(__dirname, 'dist'),
         clean: true,
     },
+    mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
     devtool: process.env.NODE_ENV === 'development' ? 'eval-source-map' : false,
+    performance: { hints: false },
     module: {
         rules: [
             {
@@ -47,13 +49,15 @@ module.exports = {
             patterns: [
                 {
                     from: 'static',
+                    globOptions: {
+                        ignore: ['**/manifest.json'],
+                    },
                 },
                 {
                     from: 'node_modules/canvaskit-wasm/bin/canvaskit.wasm',
                 },
                 {
                     from: 'static/manifest.json',
-                    force: true,
                     transform: (content, _path) => {
                         const manifest = JSON.parse(content.toString());
                         manifest.version = version;

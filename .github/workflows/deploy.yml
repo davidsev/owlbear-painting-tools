@@ -18,6 +18,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       ######
+      # Validate trigger
+      ######
+      - name: Validate tag (workflow_dispatch only)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          if [[ "${{ github.ref_type }}" != "tag" || ! "${{ github.ref_name }}" =~ ^v ]]; then
+            echo "::error::Deploy must be run from a tag matching 'v*' (got ref_type=${{ github.ref_type }}, ref_name=${{ github.ref_name }})"
+            exit 1
+          fi
+      ######
       # Build
       ######
       - name: Checkout
@@ -25,7 +35,8 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
-          node-version: "24"
+          node-version-file: ".nvmrc"
+          cache: "npm"
       - name: Install dependencies
         run: npm ci
       - name: Test
@@ -33,7 +44,7 @@ jobs:
       - name: Build
         env:
           URL_PREFIX: https://painting-tools.owlbear.davidsev.co.uk/${{ github.ref_name }}
-        run: npm run prod
+        run: npm run build
       ######
       # Login to AWS
       ######
@@ -48,6 +59,9 @@ jobs:
       ######
       - name: Deploy to S3
         run: |
-          aws s3 sync --metadata-directive REPLACE --cache-control "public, max-age=604800, immutable" ./dist "s3://${{ secrets.S3_BUCKET }}/${{ github.ref_name }}" --delete
+          aws s3 sync --metadata-directive REPLACE --cache-control "public, max-age=31536000, immutable" ./dist "s3://${{ secrets.S3_BUCKET }}/${{ github.ref_name }}" --delete
+      - name: Update root files (stable releases only)
+        if: ${{ !contains(github.ref_name, '-') }}
+        run: |
           aws s3 cp --metadata-directive REPLACE --cache-control 'public, max-age=300' ./dist/manifest.json "s3://${{ secrets.S3_BUCKET }}/"
           aws s3 cp --metadata-directive REPLACE --cache-control 'public, max-age=3600' --recursive ./static_root/ "s3://${{ secrets.S3_BUCKET }}/"
