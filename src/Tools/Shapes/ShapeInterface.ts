@@ -8,5 +8,7 @@ export interface ShapeInterface {
 
     getGuidePathCommands (): Promise<null | PathCommand[]>;
 
+    getInnerLinesPathCommands (): Promise<null | PathCommand[]>;
+
     clear (): Promise<void>;
 }

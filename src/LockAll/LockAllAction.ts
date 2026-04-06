@@ -14,7 +14,7 @@ export class LockAllAction implements ToolAction {
     }];
 
     async onClick (_context: ToolContext) {
-        lockSceneMetadata.set({ isLocked: true });
+        await lockSceneMetadata.set({ isLocked: true });
         await OBR.scene.items.updateItems(shouldLock, (items) => {
             for (const item of items) {
                 item.locked = true;

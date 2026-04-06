@@ -2,6 +2,7 @@ import { type Cell, grid } from '@davidsev/owlbear-utils';
 import type { PathCommand, Vector2 } from '@owlbear-rodeo/sdk';
 import { awaitCanvasKit } from '../../Utils/awaitCanvasKit';
 import { addCellsToPath } from '../../Utils/cellsToPath';
+import { sharedEdgesToPathCommands } from '../../Utils/sharedEdgesToPathCommands';
 import { skiaPathToObrPath } from '../../Utils/skiaPathToObrPath';
 import type { ShapeInterface } from './ShapeInterface';
 
@@ -35,5 +36,10 @@ export class SelectCellsShape implements ShapeInterface {
 
     public async getGuidePathCommands (): Promise<null> {
         return null;
+    }
+
+    public async getInnerLinesPathCommands (): Promise<PathCommand[] | null> {
+        if (this.cells.size < 2) return null;
+        return sharedEdgesToPathCommands(this.cells.values());
     }
 }

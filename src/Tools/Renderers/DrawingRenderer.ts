@@ -1,35 +1,84 @@
-import { grid } from '@davidsev/owlbear-utils';
-import OBR, { buildPath } from '@owlbear-rodeo/sdk';
-import { drawingToolMetadata } from '../../Metadata/DrawingToolMetadata';
+import { type Cell, grid } from '@davidsev/owlbear-utils';
+import OBR, { buildPath, isPath, type Path, type PathCommand } from '@owlbear-rodeo/sdk';
+import type { CanvasKit, Path as SkiaPath } from 'canvaskit-wasm';
+import { type MergeGroup, mergeItemMetadataMapper } from '../../Metadata/MergeItemMetadata';
+import { settings } from '../../Settings/Settings';
+import { awaitCanvasKit } from '../../Utils/awaitCanvasKit';
+import { addCellsToPath } from '../../Utils/cellsToPath';
+import { cascadingMerge } from '../../Utils/findTouchingPaths';
 import { getGridColor } from '../../Utils/getGridColor';
+import getId from '../../Utils/getId';
+import { obrPathToSkiaPath } from '../../Utils/obrPathToSkiaPath';
+import { sharedEdgesToPathCommands } from '../../Utils/sharedEdgesToPathCommands';
+import { skiaPathToObrPath } from '../../Utils/skiaPathToObrPath';
 import type { ShapeInterface } from '../Shapes/ShapeInterface';
 import { BaseRenderer } from './BaseRenderer';
 
 export class DrawingRenderer extends BaseRenderer {
 
-    public async startPreview (shape: ShapeInterface): Promise<void> {
-        this.removePreview();
+    public allStylesDisabled (hasInnerLines: boolean): boolean {
+        return settings.borderMode === 'off'
+            && settings.fillMode === 'off'
+            && (!hasInnerLines || settings.innerLinesMode === 'off');
+    }
 
-        const [pathCommands, guidePathCommands, drawingMetadata] = await Promise.all([
+    public async startPreview (shape: ShapeInterface): Promise<void> {
+
+        const [pathCommands, guidePathCommands, innerLinesCommands, border, fill, innerLines] = await Promise.all([
             shape.getPathCommands(),
             shape.getGuidePathCommands(),
-            drawingToolMetadata.get(),
+            shape.getInnerLinesPathCommands(),
+            settings.resolvedBorder(),
+            settings.resolvedFill(),
+            settings.resolvedInnerLines(),
         ]);
 
-        this.path = buildPath()
-            .position({ x: 0, y: 0 })
-            .locked(true)
-            .strokeColor(drawingMetadata.strokeColor)
-            .strokeWidth(drawingMetadata.strokeWidth)
-            .strokeOpacity(drawingMetadata.strokeOpacity)
-            .strokeDash(drawingMetadata.strokeDash.map(x => x * drawingMetadata.strokeWidth))
-            .fillOpacity(drawingMetadata.fillOpacity)
-            .fillColor(drawingMetadata.fillColor)
-            .fillRule('evenodd')
-            .disableHit(true)
-            .layer('POPOVER')
-            .commands(pathCommands)
-            .build();
+        // Fill path (back)
+        if (fill) {
+            this.path = buildPath()
+                .position({ x: 0, y: 0 })
+                .locked(true)
+                .strokeWidth(0)
+                .fillColor(fill.fillColor)
+                .fillOpacity(fill.fillOpacity)
+                .fillRule('evenodd')
+                .disableHit(true)
+                .layer('POPOVER')
+                .commands(pathCommands)
+                .build();
+        }
+
+        // Inner lines (middle)
+        if (innerLines) {
+            this.innerLinesPath = buildPath()
+                .position({ x: 0, y: 0 })
+                .locked(true)
+                .strokeColor(innerLines.strokeColor)
+                .strokeWidth(innerLines.strokeWidth)
+                .strokeOpacity(innerLines.strokeOpacity)
+                .strokeDash(innerLines.strokeDash)
+                .fillOpacity(0)
+                .disableHit(true)
+                .layer('POPOVER')
+                .commands(innerLinesCommands ?? [])
+                .build();
+        }
+
+        // Border path (front)
+        if (border) {
+            this.borderPath = buildPath()
+                .position({ x: 0, y: 0 })
+                .locked(true)
+                .strokeColor(border.strokeColor)
+                .strokeWidth(border.strokeWidth)
+                .strokeOpacity(border.strokeOpacity)
+                .strokeDash(border.strokeDash)
+                .fillOpacity(0)
+                .disableHit(true)
+                .layer('POPOVER')
+                .commands(pathCommands)
+                .build();
+        }
 
         if (guidePathCommands) {
             const colour = getGridColor(grid.style.lineColor);
@@ -45,30 +94,203 @@ export class DrawingRenderer extends BaseRenderer {
                 .build();
         }
 
+        const items: Path[] = [];
+        if (this.path) items.push(this.path);
+        if (this.innerLinesPath) items.push(this.innerLinesPath);
+        if (this.borderPath) items.push(this.borderPath);
+
         await Promise.all([
-            OBR.scene.local.addItems([this.path]),
+            items.length > 0 ? OBR.scene.local.addItems(items) : Promise.resolve(),
             this.guidePath ? OBR.scene.local.addItems([this.guidePath]) : Promise.resolve(),
         ]);
     }
 
-    public async saveFinalShape (shape: ShapeInterface): Promise<void> {
-        const [pathCommands, drawingMetadata] = await Promise.all([
+    private async nextZIndex (): Promise<number> {
+        // We need explicit z-indices because adding the fill/innerLines/border items in a single
+        // addItems call doesn't guarantee their final z-order — we need fill < innerLines < border.
+        // reduce (rather than Math.max(...spread)) avoids stack-overflow on very large scenes.
+        const items = await OBR.scene.items.getItems(i => i.layer === 'DRAWING');
+        return items.reduce((m, i) => Math.max(m, i.zIndex), 0) + 1;
+    }
+
+    public async saveFinalShape (shape: ShapeInterface, mergeGroup: MergeGroup): Promise<void> {
+        const [pathCommands, innerLinesCommands, border, fill, innerLines, zIndex] = await Promise.all([
             shape.getPathCommands(),
-            drawingToolMetadata.get(),
+            shape.getInnerLinesPathCommands(),
+            settings.resolvedBorder(),
+            settings.resolvedFill(),
+            settings.resolvedInnerLines(),
+            this.nextZIndex(),
         ]);
 
-        await OBR.scene.items.addItems([buildPath()
-            .position({ x: 0, y: 0 })
-            .layer('DRAWING')
-            .strokeColor(drawingMetadata.strokeColor)
-            .strokeWidth(drawingMetadata.strokeWidth)
-            .strokeOpacity(drawingMetadata.strokeOpacity)
-            .strokeDash(drawingMetadata.strokeDash.map(x => x * drawingMetadata.strokeWidth))
-            .fillOpacity(drawingMetadata.fillOpacity)
-            .fillColor(drawingMetadata.fillColor)
-            .fillRule('evenodd')
-            .commands(pathCommands)
-            .build(),
-        ]);
+        if (pathCommands.length === 0) return;
+
+        let finalPathCommands = pathCommands;
+        let finalInnerLinesCommands = innerLinesCommands;
+        const idsToDelete: string[] = [];
+
+        // Auto-merge: find touching items and merge paths
+        if (settings.autoMergeDrawing === 'on') {
+            const canvasKit = await awaitCanvasKit();
+            const allItems = await OBR.scene.items.getItems<Path>(i => isPath(i) && i.layer === 'DRAWING');
+
+            // Find fill items with matching merge group
+            const fillItems = allItems.filter(item => {
+                const meta = mergeItemMetadataMapper.get(item);
+                return meta.group === mergeGroup && meta.role === 'fill';
+            });
+
+            if (fillItems.length > 0) {
+                const newPath = obrPathToSkiaPath(pathCommands, canvasKit);
+                const { mergedPath, mergedItems } = cascadingMerge(newPath, fillItems, canvasKit);
+                newPath.delete();
+
+                if (mergedItems.length > 0) {
+                    // Collect all items to delete (merged fills + their siblings)
+                    for (const mergedFill of mergedItems) {
+                        for (const id of this.collectAttachmentGroup(mergedFill, allItems))
+                            idsToDelete.push(id);
+                    }
+
+                    if (mergeGroup === 'cells') {
+                        // Derive cells from merged path and recompute outline + inner lines
+                        const derived = this.deriveCellsFromPath(mergedPath, canvasKit);
+                        finalPathCommands = derived.outline;
+                        finalInnerLinesCommands = derived.innerLines;
+                    } else {
+                        // Brush: just use the union path
+                        finalPathCommands = skiaPathToObrPath(mergedPath.toCmds());
+                    }
+                }
+
+                mergedPath.delete();
+            }
+        }
+
+        // Build items with metadata
+        const items: Path[] = [];
+        const mergeMetaKey = getId('merge');
+
+        // Fill path (back)
+        if (fill) {
+            items.push(buildPath()
+                .position({ x: 0, y: 0 })
+                .layer('DRAWING')
+                .zIndex(zIndex)
+                .strokeWidth(0)
+                .fillColor(fill.fillColor)
+                .fillOpacity(fill.fillOpacity)
+                .fillRule('evenodd')
+                .metadata({ [mergeMetaKey]: { group: mergeGroup, role: 'fill' } })
+                .commands(finalPathCommands)
+                .build());
+        }
+
+        // Inner lines (middle)
+        if (finalInnerLinesCommands && innerLines) {
+            items.push(buildPath()
+                .position({ x: 0, y: 0 })
+                .layer('DRAWING')
+                .zIndex(zIndex + 1)
+                .strokeColor(innerLines.strokeColor)
+                .strokeWidth(innerLines.strokeWidth)
+                .strokeOpacity(innerLines.strokeOpacity)
+                .strokeDash(innerLines.strokeDash)
+                .fillOpacity(0)
+                .metadata({ [mergeMetaKey]: { group: mergeGroup, role: 'innerLines' } })
+                .commands(finalInnerLinesCommands)
+                .build());
+        }
+
+        // Border path (front)
+        if (border) {
+            items.push(buildPath()
+                .position({ x: 0, y: 0 })
+                .layer('DRAWING')
+                .zIndex(zIndex + 2)
+                .strokeColor(border.strokeColor)
+                .strokeWidth(border.strokeWidth)
+                .strokeOpacity(border.strokeOpacity)
+                .strokeDash(border.strokeDash)
+                .fillOpacity(0)
+                .metadata({ [mergeMetaKey]: { group: mergeGroup, role: 'border' } })
+                .commands(finalPathCommands)
+                .build());
+        }
+
+        if (items.length === 0) return;
+
+        // Attach items in a loop so they move/select together
+        if (items.length > 1) {
+            for (let i = 0; i < items.length; i++)
+                items[i].attachedTo = items[(i + 1) % items.length].id;
+        }
+
+        await OBR.scene.items.addItems(items);
+
+        if (idsToDelete.length > 0)
+            await OBR.scene.items.deleteItems([...new Set(idsToDelete)]);
+    }
+
+    /** Collect all item IDs in an attachment group (including the given item). */
+    private collectAttachmentGroup (item: Path, allItems: Path[]): string[] {
+        const ids: string[] = [item.id];
+        const itemMap = new Map(allItems.map(i => [i.id, i]));
+        let current = item;
+        // Attachment chains are at most 3 items (fill, innerLines, border) — the counter
+        // is a safety cap in case metadata is ever corrupted into an unbounded loop.
+        for (let i = 0; i < 3 && current.attachedTo; i++) {
+            const next = itemMap.get(current.attachedTo);
+            if (!next || next.id === item.id) break;
+            ids.push(next.id);
+            current = next;
+        }
+        return ids;
+    }
+
+    /** Derive cells from a merged CanvasKit path and recompute outline + inner lines. */
+    private deriveCellsFromPath (mergedPath: SkiaPath, canvasKit: CanvasKit): {
+        outline: PathCommand[];
+        innerLines: PathCommand[] | null;
+    } {
+        const bounds = mergedPath.getBounds();
+        const cornerCells = [
+            grid.getCell({ x: bounds[0], y: bounds[1] }),
+            grid.getCell({ x: bounds[2], y: bounds[1] }),
+            grid.getCell({ x: bounds[0], y: bounds[3] }),
+            grid.getCell({ x: bounds[2], y: bounds[3] }),
+        ];
+        const allCells = grid.iterateCellsBoundingPoints(cornerCells as Cell[]);
+
+        // Expand the path slightly to counteract geometry drift from CanvasKit simplify/union.
+        const expanded = mergedPath.copy();
+        const stroked = mergedPath.copy();
+        if (stroked.stroke({ width: 4 }))
+            expanded.op(stroked, canvasKit.PathOp.Union);
+        stroked.delete();
+
+        const matchingCells = allCells.filter(
+            (cell: Cell) => expanded.contains(cell.center.x, cell.center.y),
+        );
+        expanded.delete();
+
+        if (matchingCells.length === 0) {
+            // Fallback: use the raw merged path
+            return { outline: skiaPathToObrPath(mergedPath.toCmds()), innerLines: null };
+        }
+
+        // Recompute outline from cells
+        const outlinePath = new canvasKit.Path();
+        addCellsToPath(matchingCells, outlinePath);
+        outlinePath.simplify();
+        const outline = skiaPathToObrPath(outlinePath.toCmds());
+        outlinePath.delete();
+
+        // Recompute inner lines from cells
+        const innerLinesResult = matchingCells.length >= 2
+            ? sharedEdgesToPathCommands(matchingCells)
+            : null;
+
+        return { outline, innerLines: innerLinesResult };
     }
 }

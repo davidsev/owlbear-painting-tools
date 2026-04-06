@@ -58,8 +58,12 @@ module.exports = {
                         const manifest = JSON.parse(content.toString());
                         manifest.version = version;
                         const url_prefix = process.env.URL_PREFIX || '';
+                        // OBR requires every path in the manifest to be absolute in production —
+                        // it doesn't resolve them relative to the manifest URL.
                         manifest.background_url = url_prefix + manifest.background_url;
                         manifest.icon = url_prefix + manifest.icon;
+                        manifest.action.icon = url_prefix + manifest.action.icon;
+                        manifest.action.popover = url_prefix + manifest.action.popover;
                         return JSON.stringify(manifest, null, 4);
                     },
                 },

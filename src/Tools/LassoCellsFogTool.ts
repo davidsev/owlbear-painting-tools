@@ -7,6 +7,7 @@ import { LassoCellsShape } from './Shapes/LassoCellsShape';
 export class LassoCellsFogTool extends BaseTool <FogRenderer, LassoCellsShape> {
 
     readonly id: string = getId('lassoCellsFog');
+    readonly mergeGroup = 'cells' as const;
     readonly icons: ToolIcon[] = [{
         icon: `${URL_PREFIX}/lassoCells.svg`,
         label: 'Select Area',

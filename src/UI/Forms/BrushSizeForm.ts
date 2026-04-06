@@ -1,28 +1,32 @@
+import { BaseElement, baseCSS } from '@davidsev/owlbear-ui';
+import '@davidsev/owlbear-ui/components/Input';
 import { html } from 'lit';
 import { customElement, query } from 'lit/decorators.js';
-import { BaseElement } from '../BaseElement';
-import { baseCSS } from '../baseCSS';
-import style from './BrushSizeForm.css';
+import { settings } from '../../Settings/Settings';
 
 @customElement('brush-size-form')
 export class BrushSizeForm extends BaseElement {
 
-    static styles = baseCSS(style);
+    static override styles = baseCSS(`
+        :host {
+            overflow: hidden;
+            padding: 2px 12px 0 12px;
+        }
+    `);
 
-    @query('input')
-    private accessor input!: HTMLInputElement;
+    @query('obui-input')
+    private accessor input!: HTMLElement & { valueAsNumber: number };
 
-    render () {
+    override render () {
         return html`
             <main>
-                <input type="range" min="0.4" max="2" step="0.1" @change="${this.barChanged}"
-                       value="${Math.sqrt(parseFloat(localStorage.getItem('brushRadius') || '0.25') * 2)}"/>
+                <obui-input type="range" min="0.4" max="2" step="0.1" @change="${this._onBrushSizeChange}"
+                       value="${Math.sqrt(settings.brushRadius * 2)}"></obui-input>
             </main>
         `;
     }
 
-    private barChanged () {
-        localStorage.setItem('brushRadius', (this.input.valueAsNumber ** 2 / 2).toString());
+    private _onBrushSizeChange () {
+        settings.brushRadius = this.input.valueAsNumber ** 2 / 2;
     }
 }
-

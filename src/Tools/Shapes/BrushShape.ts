@@ -1,6 +1,7 @@
 import { grid, Point } from '@davidsev/owlbear-utils';
 import type { PathCommand, Vector2 } from '@owlbear-rodeo/sdk';
 import type { Path } from 'canvaskit-wasm';
+import { settings } from '../../Settings/Settings';
 import { awaitCanvasKit } from '../../Utils/awaitCanvasKit';
 import { skiaPathToObrPath } from '../../Utils/skiaPathToObrPath';
 import type { ShapeInterface } from './ShapeInterface';
@@ -11,7 +12,7 @@ export class BrushShape implements ShapeInterface {
     private path: Path | null = null;
 
     public get radius (): number {
-        return parseFloat(localStorage.getItem('brushRadius') || '0.25') * 2 * grid.dpi;
+        return settings.brushRadius * 2 * grid.dpi;
     }
 
     public async add (point: Vector2): Promise<void> {
@@ -21,7 +22,7 @@ export class BrushShape implements ShapeInterface {
         if (!this.path)
             this.path = new canvasKit.Path();
 
-        if (!this.points.length || this.points[this.points.length - 1].distanceTo(new Point(point)) > 10) {
+        if (!this.points.length || this.points[this.points.length - 1].distanceTo(new Point(point)) > grid.dpi / 10) {
             const prevPoint = this.points[this.points.length - 1] ?? null;
             const newPoint = new Point(point);
             this.points.push(newPoint);
@@ -57,13 +58,17 @@ export class BrushShape implements ShapeInterface {
     }
 
     public async getPathCommands (): Promise<PathCommand[]> {
-        if (this.path)
-            return skiaPathToObrPath(this.path.toCmds());
-        else
+        if (!this.path)
             return [];
+        this.path.simplify();
+        return skiaPathToObrPath(this.path.toCmds());
     }
 
     public async getGuidePathCommands (): Promise<PathCommand[] | null> {
+        return null;
+    }
+
+    public async getInnerLinesPathCommands (): Promise<PathCommand[] | null> {
         return null;
     }
 }

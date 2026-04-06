@@ -7,6 +7,7 @@ import { SelectCellsShape } from './Shapes/SelectCellsShape';
 export class SelectCellsDrawingTool extends BaseTool<DrawingRenderer, SelectCellsShape> {
 
     readonly id: string = getId('highlightCellsDrawing');
+    readonly mergeGroup = 'cells' as const;
     readonly icons: ToolIcon[] = [{
         icon: `${URL_PREFIX}/selectCells.svg`,
         label: 'Select Cells',
@@ -14,6 +15,7 @@ export class SelectCellsDrawingTool extends BaseTool<DrawingRenderer, SelectCell
             activeTools: ['rodeo.owlbear.tool/drawing'],
         },
     }];
+    protected override readonly hasInnerLines = true;
 
     constructor () {
         super(new DrawingRenderer(), new SelectCellsShape());

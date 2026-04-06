@@ -1,19 +1,19 @@
+import { ThemeManager } from '@davidsev/owlbear-ui';
 import OBR from '@owlbear-rodeo/sdk';
 import { registerInitFunction } from './init';
+import { LockActionManager } from './LockAll/LockActionManager';
+import { BrushDrawingTool } from './Tools/BrushDrawingTool';
+import { BrushFogTool } from './Tools/BrushFogTool';
 import { LassoCellsDrawingTool } from './Tools/LassoCellsDrawingTool';
 import { LassoCellsFogTool } from './Tools/LassoCellsFogTool';
 import { SelectCellsDrawingTool } from './Tools/SelectCellsDrawingTool';
 import { SelectCellsFogTool } from './Tools/SelectCellsFogTool';
-import styles from './UI/baseCSS.css';
 import { BrushSizeForm } from './UI/Forms/BrushSizeForm';
-import './UI';
-import { LockActionManager } from './LockAll/LockActionManager';
-import { BrushDrawingTool } from './Tools/BrushDrawingTool';
-import { BrushFogTool } from './Tools/BrushFogTool';
+import { SettingsForm } from './UI/SettingsForm';
 
 registerInitFunction('background', async () => {
     new LockActionManager();
-    return Promise.all([
+    await Promise.all([
         OBR.tool.createMode(new SelectCellsFogTool()),
         OBR.tool.createMode(new LassoCellsFogTool()),
         OBR.tool.createMode(new BrushFogTool()),
@@ -24,9 +24,11 @@ registerInitFunction('background', async () => {
 });
 
 registerInitFunction('brush-settings', () => {
+    ThemeManager.getInstance().connectOBR();
     document.body.appendChild(new BrushSizeForm());
+});
 
-    const styleSheet = document.createElement('style');
-    styleSheet.innerText = styles;
-    document.head.appendChild(styleSheet);
+registerInitFunction('settings', () => {
+    ThemeManager.getInstance().connectOBR();
+    document.body.appendChild(new SettingsForm());
 });

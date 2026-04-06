@@ -12,7 +12,8 @@ async function init () {
 
     const id = window.location.hash.slice(1);
     const callback = functions.get(id);
-    if (callback) callback();
+    if (callback)
+        await callback();
 }
 
-init();
+init().catch(err => console.error('init failed', err));

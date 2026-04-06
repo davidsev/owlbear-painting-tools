@@ -7,16 +7,21 @@ import { BrushShape } from './Shapes/BrushShape';
 
 export abstract class BaseBrushTool<RendererType extends RendererInterface> extends BaseTool<RendererType, BrushShape> {
 
+    readonly mergeGroup = 'brush' as const;
+
     constructor (renderer: RendererType) {
         super(renderer, new BrushShape());
     }
 
     // When the tool is activated, show the settings popup and the cursor.
-    public async onActivate (): Promise<void> {
+    public override async onActivate (): Promise<boolean> {
+        if (!await super.onActivate())
+            return false;
         await Promise.all([
             this.showSettingsPopup(),
             this.showCursor(),
         ]);
+        return true;
     }
 
     // When the tool is deactivated, hide the settings popup and the cursor.
