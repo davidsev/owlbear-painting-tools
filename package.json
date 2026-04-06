@@ -1,5 +1,5 @@
 {
-  "version": "0.7.0",
+  "version": "1.0.0-RC1",
   "private": true,
   "scripts": {
     "serve": "URL_PREFIX=http://localhost:8091 webpack-dev-server --config-node-env=development --port 8091 --hot",
