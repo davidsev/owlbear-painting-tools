@@ -22,8 +22,9 @@ export class BrushShape implements ShapeInterface {
         if (!this.path)
             this.path = new canvasKit.Path();
 
-        if (!this.points.length || this.points[this.points.length - 1].distanceTo(new Point(point)) > grid.dpi / 10) {
-            const prevPoint = this.points[this.points.length - 1] ?? null;
+        const lastPoint = this.points[this.points.length - 1];
+        if (!lastPoint || lastPoint.distanceTo(new Point(point)) > grid.dpi / 10) {
+            const prevPoint = lastPoint ?? null;
             const newPoint = new Point(point);
             this.points.push(newPoint);
 

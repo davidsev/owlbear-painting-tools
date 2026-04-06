@@ -33,13 +33,14 @@ export class LassoCellsShape implements ShapeInterface {
         if (this._cachedResolvedCells !== null)
             return this._cachedResolvedCells;
 
-        if (this.points.length < 3) {
+        const firstPoint = this.points[0];
+        if (this.points.length < 3 || !firstPoint) {
             this._cachedResolvedCells = [];
             return this._cachedResolvedCells;
         }
 
         // Make a simplified version of the path with less points.
-        const simplifiedPoints = simplify([...this.points, this.points[0]], 2, false).map(p => new Point(p));
+        const simplifiedPoints = simplify([...this.points, firstPoint], 2, false).map(p => new Point(p));
 
         // Add extra points to long lines, so a long thin lasso segment can't pass through a cell without any points hitting.
         const lassoPolys = fillGapsInPath(simplifiedPoints, grid.dpi / 2);

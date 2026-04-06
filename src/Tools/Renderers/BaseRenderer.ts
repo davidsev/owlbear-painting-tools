@@ -27,24 +27,28 @@ export abstract class BaseRenderer implements RendererInterface {
         const promises = [];
         if (this.path) {
             promises.push(OBR.scene.local.updateItems([this.path.id], ([path]) => {
+                if (!path) return;
                 if (isPath(path))
                     path.commands = pathCommands;
             }));
         }
         if (this.borderPath) {
             promises.push(OBR.scene.local.updateItems([this.borderPath.id], ([path]) => {
+                if (!path) return;
                 if (isPath(path))
                     path.commands = pathCommands;
             }));
         }
         if (this.guidePath) {
             promises.push(OBR.scene.local.updateItems([this.guidePath.id], ([path]) => {
+                if (!path) return;
                 if (isPath(path))
                     path.commands = guidePathCommands || [];
             }));
         }
         if (this.innerLinesPath) {
             promises.push(OBR.scene.local.updateItems([this.innerLinesPath.id], ([path]) => {
+                if (!path) return;
                 if (isPath(path))
                     path.commands = innerLinesCommands ?? [];
             }));

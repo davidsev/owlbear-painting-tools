@@ -222,8 +222,12 @@ export class DrawingRenderer extends BaseRenderer {
 
         // Attach items in a loop so they move/select together
         if (items.length > 1) {
-            for (let i = 0; i < items.length; i++)
-                items[i].attachedTo = items[(i + 1) % items.length].id;
+            for (let i = 0; i < items.length; i++) {
+                const cur = items[i];
+                const next = items[(i + 1) % items.length];
+                if (!cur || !next) continue;
+                cur.attachedTo = next.id;
+            }
         }
 
         await OBR.scene.items.addItems(items);
@@ -253,12 +257,15 @@ export class DrawingRenderer extends BaseRenderer {
         outline: PathCommand[];
         innerLines: PathCommand[] | null;
     } {
-        const bounds = mergedPath.getBounds();
+        const bounds = Array.from(mergedPath.getBounds());
+        if(bounds.length !== 4)
+            throw new Error('Merged path bounds must be 4-dimensional');
+        const [left, top, right, bottom] = Array.from(mergedPath.getBounds()) as [number, number, number, number];
         const cornerCells = [
-            grid.getCell({ x: bounds[0], y: bounds[1] }),
-            grid.getCell({ x: bounds[2], y: bounds[1] }),
-            grid.getCell({ x: bounds[0], y: bounds[3] }),
-            grid.getCell({ x: bounds[2], y: bounds[3] }),
+            grid.getCell({ x: left, y: top }),
+            grid.getCell({ x: right, y: top }),
+            grid.getCell({ x: left, y: bottom }),
+            grid.getCell({ x: right, y: bottom }),
         ];
         const allCells = grid.iterateCellsBoundingPoints(cornerCells as Cell[]);
 

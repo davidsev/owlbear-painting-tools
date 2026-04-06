@@ -34,16 +34,16 @@ describe('fillGapsInPath', () => {
         const pts = [point(0, 0)];
         const result = fillGapsInPath(pts, 10);
         expect(result).toHaveLength(1);
-        expect(result[0].x).toBe(0);
-        expect(result[0].y).toBe(0);
+        expect(result[0]?.x).toBe(0);
+        expect(result[0]?.y).toBe(0);
     });
 
     it('does not interpolate when points are within maxDistance', () => {
         const pts = [point(0, 0), point(5, 0)];
         const result = fillGapsInPath(pts, 10);
         expect(result).toHaveLength(2);
-        expect(result[0].x).toBe(0);
-        expect(result[1].x).toBe(5);
+        expect(result[0]?.x).toBe(0);
+        expect(result[1]?.x).toBe(5);
     });
 
     it('interpolates when gap exceeds maxDistance', () => {
@@ -52,9 +52,9 @@ describe('fillGapsInPath', () => {
         // Distance is 20, maxDistance is 10, so ceil(20/10) = 2 steps
         // Interpolated: (10, 0), then the endpoint (20, 0)
         expect(result).toHaveLength(3);
-        expect(result[0].x).toBe(0);
-        expect(result[1].x).toBe(10);
-        expect(result[2].x).toBe(20);
+        expect(result[0]?.x).toBe(0);
+        expect(result[1]?.x).toBe(10);
+        expect(result[2]?.x).toBe(20);
     });
 
     it('interpolates diagonal paths', () => {
@@ -62,10 +62,10 @@ describe('fillGapsInPath', () => {
         // Distance = 50, maxDistance = 10, ceil(50/10) = 5 steps
         const result = fillGapsInPath(pts, 10);
         expect(result).toHaveLength(6); // original + 4 interpolated + endpoint
-        expect(result[0].x).toBe(0);
-        expect(result[0].y).toBe(0);
-        expect(result[5].x).toBe(30);
-        expect(result[5].y).toBe(40);
+        expect(result[0]?.x).toBe(0);
+        expect(result[0]?.y).toBe(0);
+        expect(result[5]?.x).toBe(30);
+        expect(result[5]?.y).toBe(40);
     });
 
     it('handles multi-segment paths', () => {
@@ -75,8 +75,8 @@ describe('fillGapsInPath', () => {
         // Second segment: 20 / 10 = 2 steps → 1 interpolated + endpoint = 2 new points
         // Total: 1 (start) + 2 + 2 = 5
         expect(result).toHaveLength(5);
-        expect(result[0].x).toBe(0);
-        expect(result[result.length - 1].y).toBe(20);
+        expect(result[0]?.x).toBe(0);
+        expect(result[result.length - 1]?.y).toBe(20);
     });
 
     it('returns points unchanged when maxDistance is zero', () => {

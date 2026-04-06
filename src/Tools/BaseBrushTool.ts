@@ -97,6 +97,7 @@ export abstract class BaseBrushTool<RendererType extends RendererInterface> exte
         this._inUpdate = true;
         try {
             await OBR.scene.local.updateItems([this.cursor.id], ([cursor]) => {
+                if (!cursor) return;
                 if (isShape(cursor)) {
                     cursor.position = point;
                     cursor.width = this.shape.radius * 2;

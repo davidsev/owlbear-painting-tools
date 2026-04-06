@@ -39,7 +39,7 @@ class Settings {
 
     private _setEnum<T extends string> (key: string, allowed: readonly T[], value: T, defaultValue: T): void {
         if (!(allowed as readonly string[]).includes(value)) {
-            console.log(`Invalid value '${value}' for setting '${key}', using default '${defaultValue}'`);
+            console.error(`Invalid value '${value}' for setting '${key}', using default '${defaultValue}'`);
             value = defaultValue;
         }
         localStorage.setItem(STORAGE_PREFIX + key, value);

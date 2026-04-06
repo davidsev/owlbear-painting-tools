@@ -24,7 +24,23 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true
+      "recommended": true,
+      "style": {
+        "useImportType": "error",
+        "useExportType": "error",
+        "noNonNullAssertion": "error",
+        "useTemplate": "error",
+        "useThrowOnlyError": "error",
+        "useThrowNewError": "error",
+        "useShorthandAssign": "error",
+        "useExplicitLengthCheck": "error",
+        "useDefaultParameterLast": "error",
+        "useCollapsedElseIf": "error"
+      },
+      "suspicious": {
+        "noConsole": { "level": "error", "options": { "allow": ["error", "warn"] } },
+        "noEmptyBlockStatements": "error"
+      }
     }
   },
   "json": {

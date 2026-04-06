@@ -5,8 +5,11 @@ export function pointInPoly (test: Point, points: Point[]): boolean {
     let inPoly = false;
 
     for (let i = 0, j = points.length - 1; i < points.length; j = i++) {
-        if (((points[i].y > test.y) !== (points[j].y > test.y)) &&
-            (test.x < (points[j].x - points[i].x) * (test.y - points[i].y) / (points[j].y - points[i].y) + points[i].x))
+        const pi = points[i];
+        const pj = points[j];
+        if (!pi || !pj) continue;
+        if (((pi.y > test.y) !== (pj.y > test.y)) &&
+            (test.x < (pj.x - pi.x) * (test.y - pi.y) / (pj.y - pi.y) + pi.x))
             inPoly = !inPoly;
     }
 

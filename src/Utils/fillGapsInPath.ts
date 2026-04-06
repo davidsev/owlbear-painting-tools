@@ -1,14 +1,14 @@
 import type { Point } from '@davidsev/owlbear-utils';
 
 export function fillGapsInPath (points: Point[], maxDistance: number): Point[] {
-    if (points.length <= 1 || maxDistance <= 0) {
+    const firstPoint = points[0];
+    if (firstPoint === undefined || points.length <= 1 || maxDistance <= 0) {
         return points;
     }
 
-    let lastPoint = points[0];
+    let lastPoint: Point = firstPoint;
     const ret: Point[] = [lastPoint];
-    for (let i = 1; i < points.length; i++) {
-        const nextPoint = points[i];
+    for (const nextPoint of points.slice(1)) {
         const distance = lastPoint.distanceTo(nextPoint);
         const steps = Math.ceil(distance / maxDistance);
         const stepVector = nextPoint.sub(lastPoint).div(steps);
