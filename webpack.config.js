@@ -78,5 +78,9 @@ module.exports = {
         headers: {
             'Access-Control-Allow-Origin': '*',
         },
+        // Fail loud on HMR errors instead of silently falling back to a full
+        // reload — a duplicate createMode() after a missed dispose is easier
+        // to spot when it errors than when it "works" with stale handlers.
+        hot: 'only',
     },
 };
