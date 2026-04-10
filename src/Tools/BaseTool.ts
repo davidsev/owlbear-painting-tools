@@ -28,7 +28,14 @@ export abstract class BaseTool<RendererType extends RendererInterface, ShapeType
         return true;
     }
 
+    // Coalescing loop: multiple drag-move events are folded into a single updatePreview call.
+    // _needsUpdate is set by each drag-move; the while loop drains it when idle.
+    private _updating = false;
+    private _needsUpdate = false;
+
     async onToolDragStart (_context: ToolContext, event: ToolEvent): Promise<void> {
+        this._updating = false;
+        this._needsUpdate = false;
         await this.cleanup();
         await this.shape.add(event.pointerPosition);
         await this.renderer.startPreview(this.shape);
@@ -36,15 +43,28 @@ export abstract class BaseTool<RendererType extends RendererInterface, ShapeType
 
     async onToolDragMove (_context: ToolContext, event: ToolEvent): Promise<void> {
         await this.shape.add(event.pointerPosition);
-        await this.renderer.updatePreview(this.shape);
+        this._needsUpdate = true;
+        if (this._updating) return;
+
+        this._updating = true;
+        try {
+            while (this._needsUpdate) {
+                this._needsUpdate = false;
+                await this.renderer.updatePreview(this.shape);
+            }
+        } finally {
+            this._updating = false;
+        }
     }
 
     async onToolDragEnd (_context: ToolContext, _event: ToolEvent): Promise<void> {
+        this._needsUpdate = false;
         await this.renderer.saveFinalShape(this.shape, this.mergeGroup);
         await this.cleanup();
     }
 
     async onToolDragCancel (): Promise<void> {
+        this._needsUpdate = false;
         await this.cleanup();
     }
 

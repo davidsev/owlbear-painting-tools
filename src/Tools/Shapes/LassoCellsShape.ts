@@ -14,28 +14,39 @@ export class LassoCellsShape implements ShapeInterface {
     private points: Point[] = [];
     private cells: Map<string, Cell> = new Map();
     private _cachedResolvedCells: Cell[] | null = null;
+    private _dirty = false;
+    private _lastResolveTime = 0;
+    private static readonly RESOLVE_THROTTLE_MS = 40;
 
     public async add (point: Vector2): Promise<void> {
         this.points.push(new Point(point));
+        this._dirty = true;
         const cell = grid.getCell(point);
-        if (!this.cells.has(cell.toString()))
+        if (!this.cells.has(cell.toString())) {
             this.cells.set(cell.toString(), cell);
-        this._cachedResolvedCells = null;
+            this._cachedResolvedCells = null;
+        }
     }
 
     public async clear (): Promise<void> {
         this.points = [];
         this.cells.clear();
         this._cachedResolvedCells = null;
+        this._dirty = false;
+        this._lastResolveTime = 0;
     }
 
     private _resolveCells (): Cell[] {
-        if (this._cachedResolvedCells !== null)
-            return this._cachedResolvedCells;
+        if (this._cachedResolvedCells !== null) {
+            if (!this._dirty || performance.now() - this._lastResolveTime < LassoCellsShape.RESOLVE_THROTTLE_MS)
+                return this._cachedResolvedCells;
+        }
 
         const firstPoint = this.points[0];
         if (this.points.length < 3 || !firstPoint) {
             this._cachedResolvedCells = [];
+            this._dirty = false;
+            this._lastResolveTime = performance.now();
             return this._cachedResolvedCells;
         }
 
@@ -52,6 +63,8 @@ export class LassoCellsShape implements ShapeInterface {
                 cells.push(cell);
         }
         this._cachedResolvedCells = cells;
+        this._dirty = false;
+        this._lastResolveTime = performance.now();
         return cells;
     }
 

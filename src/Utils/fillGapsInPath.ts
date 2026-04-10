@@ -8,7 +8,8 @@ export function fillGapsInPath (points: Point[], maxDistance: number): Point[] {
 
     let lastPoint: Point = firstPoint;
     const ret: Point[] = [lastPoint];
-    for (const nextPoint of points.slice(1)) {
+    for (let i = 1; i < points.length; i++) {
+        const nextPoint = points[i] as Point;
         const distance = lastPoint.distanceTo(nextPoint);
         const steps = Math.ceil(distance / maxDistance);
         const stepVector = nextPoint.sub(lastPoint).div(steps);
