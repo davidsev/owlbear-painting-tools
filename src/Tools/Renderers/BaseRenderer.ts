@@ -5,10 +5,10 @@ import type { RendererInterface } from './RendererInterface';
 
 export abstract class BaseRenderer implements RendererInterface {
 
-    protected path?: Path;
-    protected borderPath?: Path;
-    protected guidePath?: Item;
-    protected innerLinesPath?: Path;
+    protected path?: Path | undefined;
+    protected borderPath?: Path | undefined;
+    protected guidePath?: Item | undefined;
+    protected innerLinesPath?: Path | undefined;
 
     abstract allStylesDisabled (hasInnerLines: boolean): boolean;
 

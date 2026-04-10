@@ -18,7 +18,7 @@ export class UnlockAllAction implements ToolAction {
         await OBR.scene.items.updateItems(shouldUnlock, (items) => {
             for (const item of items) {
                 item.locked = false;
-                lockItemMetadataMapper.set(item, { isLocked: undefined });
+                lockItemMetadataMapper.set(item, { isLocked: false });
             }
         });
     }
