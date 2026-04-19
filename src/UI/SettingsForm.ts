@@ -107,7 +107,7 @@ export class SettingsForm extends BaseElement {
                     <label>
                         <span>Drawing</span>
                         <obui-select
-                            .options=${{ on: 'On', off: 'Off' }}
+                            .options=${{ off: 'Off', on: 'On', matchStyle: 'Match style' }}
                             .value=${settings.autoMergeDrawing}
                             @change=${this._onSelect('autoMergeDrawing')}
                         ></obui-select>

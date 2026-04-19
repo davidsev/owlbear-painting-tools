@@ -1,6 +1,7 @@
 import { drawingToolMetadata } from '../Metadata/DrawingToolMetadata';
 
 export type OnOff = 'on' | 'off';
+export type AutoMergeDrawingMode = 'off' | 'on' | 'matchStyle';
 export type BorderMode = 'off' | 'stroke' | 'custom';
 export type FillMode = 'off' | 'fill' | 'custom';
 export type InnerLinesMode = 'off' | 'stroke' | 'custom';
@@ -21,6 +22,7 @@ export interface FillStyle {
 const STORAGE_PREFIX = 'settings.';
 
 const onOffValues = ['on', 'off'] as const;
+const autoMergeDrawingModeValues = ['off', 'on', 'matchStyle'] as const;
 const borderModeValues = ['off', 'stroke', 'custom'] as const;
 const fillModeValues = ['off', 'fill', 'custom'] as const;
 const innerLinesModeValues = ['off', 'stroke', 'custom'] as const;
@@ -92,12 +94,12 @@ class Settings {
 
     // ---- Auto-merge settings ----
 
-    get autoMergeDrawing (): OnOff {
-        return this._getEnum('autoMergeDrawing', onOffValues, 'off');
+    get autoMergeDrawing (): AutoMergeDrawingMode {
+        return this._getEnum('autoMergeDrawing', autoMergeDrawingModeValues, 'off');
     }
 
-    set autoMergeDrawing (value: OnOff) {
-        this._setEnum('autoMergeDrawing', onOffValues, value, 'off');
+    set autoMergeDrawing (value: AutoMergeDrawingMode) {
+        this._setEnum('autoMergeDrawing', autoMergeDrawingModeValues, value, 'off');
     }
 
     get autoMergeFog (): OnOff {

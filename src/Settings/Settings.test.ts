@@ -66,9 +66,14 @@ describe('Settings defaults', () => {
 });
 
 describe('Settings getters with valid values', () => {
-    it('reads enum values from localStorage', () => {
+    it('reads autoMergeDrawing "on" from localStorage', () => {
         localStorage.setItem('settings.autoMergeDrawing', 'on');
         expect(settings.autoMergeDrawing).toBe('on');
+    });
+
+    it('reads autoMergeDrawing "matchStyle" from localStorage', () => {
+        localStorage.setItem('settings.autoMergeDrawing', 'matchStyle');
+        expect(settings.autoMergeDrawing).toBe('matchStyle');
     });
 
     it('reads borderMode from localStorage', () => {
@@ -120,9 +125,19 @@ describe('Settings getters with invalid values', () => {
 });
 
 describe('Settings setters', () => {
-    it('persists enum values to localStorage', () => {
+    it('persists autoMergeDrawing "on" to localStorage', () => {
         settings.autoMergeDrawing = 'on';
         expect(localStorage.getItem('settings.autoMergeDrawing')).toBe('on');
+    });
+
+    it('persists autoMergeDrawing "matchStyle" to localStorage', () => {
+        settings.autoMergeDrawing = 'matchStyle';
+        expect(localStorage.getItem('settings.autoMergeDrawing')).toBe('matchStyle');
+    });
+
+    it('roundtrips autoMergeDrawing "matchStyle"', () => {
+        settings.autoMergeDrawing = 'matchStyle';
+        expect(settings.autoMergeDrawing).toBe('matchStyle');
     });
 
     it('persists string values to localStorage', () => {

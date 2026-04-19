@@ -2,7 +2,7 @@ import { type Cell, grid } from '@davidsev/owlbear-utils';
 import OBR, { buildPath, isPath, type Path, type PathCommand } from '@owlbear-rodeo/sdk';
 import type { CanvasKit, Path as SkiaPath } from 'canvaskit-wasm';
 import { type MergeGroup, mergeItemMetadataMapper } from '../../Metadata/MergeItemMetadata';
-import { settings } from '../../Settings/Settings';
+import { type FillStyle, type StrokeStyle, settings } from '../../Settings/Settings';
 import { awaitCanvasKit } from '../../Utils/awaitCanvasKit';
 import { addCellsToPath } from '../../Utils/cellsToPath';
 import { cascadingMerge } from '../../Utils/findTouchingPaths';
@@ -130,14 +130,20 @@ export class DrawingRenderer extends BaseRenderer {
         const idsToDelete: string[] = [];
 
         // Auto-merge: find touching items and merge paths
-        if (settings.autoMergeDrawing === 'on') {
+        if (settings.autoMergeDrawing !== 'off') {
             const canvasKit = await awaitCanvasKit();
             const allItems = await OBR.scene.items.getItems<Path>(i => isPath(i) && i.layer === 'DRAWING');
+            const itemMap = new Map(allItems.map(i => [i.id, i]));
 
-            // Find fill items with matching merge group
+            // Find fill items with matching merge group (and optionally matching style)
+            const matchStyle = settings.autoMergeDrawing === 'matchStyle';
+            const effectiveInnerLines = innerLinesCommands ? innerLines : null;
             const fillItems = allItems.filter(item => {
                 const meta = mergeItemMetadataMapper.get(item);
-                return meta.group === mergeGroup && meta.role === 'fill';
+                if (meta.group !== mergeGroup || meta.role !== 'fill') return false;
+                if (matchStyle && !this.itemMatchesStyle(item, itemMap, fill, border, effectiveInnerLines))
+                    return false;
+                return true;
             });
 
             if (fillItems.length > 0) {
@@ -148,7 +154,7 @@ export class DrawingRenderer extends BaseRenderer {
                 if (mergedItems.length > 0) {
                     // Collect all items to delete (merged fills + their siblings)
                     for (const mergedFill of mergedItems) {
-                        for (const id of this.collectAttachmentGroup(mergedFill, allItems))
+                        for (const id of this.collectAttachmentGroup(mergedFill, itemMap))
                             idsToDelete.push(id);
                     }
 
@@ -237,9 +243,8 @@ export class DrawingRenderer extends BaseRenderer {
     }
 
     /** Collect all item IDs in an attachment group (including the given item). */
-    private collectAttachmentGroup (item: Path, allItems: Path[]): string[] {
+    private collectAttachmentGroup (item: Path, itemMap: Map<string, Path>): string[] {
         const ids: string[] = [item.id];
-        const itemMap = new Map(allItems.map(i => [i.id, i]));
         let current = item;
         // Attachment chains are at most 3 items (fill, innerLines, border) — the counter
         // is a safety cap in case metadata is ever corrupted into an unbounded loop.
@@ -250,6 +255,64 @@ export class DrawingRenderer extends BaseRenderer {
             current = next;
         }
         return ids;
+    }
+
+    /** Check whether a candidate fill item (and its attachment siblings) match the given styles. */
+    private itemMatchesStyle (
+        fillItem: Path,
+        itemMap: Map<string, Path>,
+        fill: FillStyle | null,
+        border: StrokeStyle | null,
+        innerLines: StrokeStyle | null,
+    ): boolean {
+        // Current draw has no fill — nothing to merge with
+        if (!fill) return false;
+
+        if (fillItem.style.fillColor !== fill.fillColor || Math.abs(fillItem.style.fillOpacity - fill.fillOpacity) > 0.01)
+            return false;
+
+        // Find siblings via attachment chain
+        const siblings = this.findSiblingsByRole(fillItem, itemMap);
+
+        if (!this.strokeStyleMatches(siblings.get('border'), border))
+            return false;
+        if (!this.strokeStyleMatches(siblings.get('innerLines'), innerLines))
+            return false;
+
+        return true;
+    }
+
+    /** Check whether an existing item's stroke style matches the expected style (both present and equal, or both absent). */
+    private strokeStyleMatches (item: Path | undefined, expected: StrokeStyle | null): boolean {
+        if (expected && item) {
+            return item.style.strokeColor === expected.strokeColor
+                && item.style.strokeWidth === expected.strokeWidth
+                && Math.abs(item.style.strokeOpacity - expected.strokeOpacity) <= 0.01
+                && this.strokeDashEquals(item.style.strokeDash, expected.strokeDash);
+        }
+        return !expected === !item;
+    }
+
+    /** Walk the attachment chain from a fill item and return siblings keyed by merge role. */
+    private findSiblingsByRole (fillItem: Path, itemMap: Map<string, Path>): Map<string, Path> {
+        const result = new Map<string, Path>();
+        let current = fillItem;
+        for (let i = 0; i < 3 && current.attachedTo; i++) {
+            const next = itemMap.get(current.attachedTo);
+            if (!next || next.id === fillItem.id) break;
+            const meta = mergeItemMetadataMapper.get(next);
+            if (meta.role) result.set(meta.role, next);
+            current = next;
+        }
+        return result;
+    }
+
+    private strokeDashEquals (a: number[], b: number[]): boolean {
+        if (a.length !== b.length) return false;
+        for (let i = 0; i < a.length; i++) {
+            if (a[i] !== b[i]) return false;
+        }
+        return true;
     }
 
     /** Derive cells from a merged CanvasKit path and recompute outline + inner lines. */
