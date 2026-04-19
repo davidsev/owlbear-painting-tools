@@ -1,7 +1,6 @@
 import { BaseElement, baseCSS } from '@davidsev/owlbear-ui';
 import '@davidsev/owlbear-ui/components/Select';
 import '@davidsev/owlbear-ui/components/Input';
-import '@davidsev/owlbear-ui/components/HelpTooltip';
 import '@davidsev/owlbear-ui/color-picker';
 import { html, nothing } from 'lit';
 import { customElement } from 'lit/decorators.js';
@@ -55,16 +54,6 @@ export class SettingsForm extends BaseElement {
             flex: 1;
         }
 
-        .setting-row {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .setting-row label {
-            flex: 1;
-        }
-
         .custom-controls {
             margin-left: 12px;
             padding-left: 12px;
@@ -103,33 +92,23 @@ export class SettingsForm extends BaseElement {
             <main>
                 <h3>Auto-merge</h3>
 
-                <div class="setting-row">
-                    <label>
-                        <span>Drawing</span>
-                        <obui-select
-                            .options=${{ off: 'Off', on: 'On', matchStyle: 'Match style' }}
-                            .value=${settings.autoMergeDrawing}
-                            @change=${this._onSelect('autoMergeDrawing')}
-                        ></obui-select>
-                    </label>
-                    <obui-help-tooltip>
-                        <p>Only auto-merges with shapes drawn by this extension</p>
-                    </obui-help-tooltip>
-                </div>
+                <label>
+                    <span>Drawing</span>
+                    <obui-select
+                        .options=${{ off: 'Off', on: 'On', matchStyle: 'Match style' }}
+                        .value=${settings.autoMergeDrawing}
+                        @change=${this._onSelect('autoMergeDrawing')}
+                    ></obui-select>
+                </label>
 
-                <div class="setting-row">
-                    <label>
-                        <span>Fog</span>
-                        <obui-select
-                            .options=${{ on: 'On', off: 'Off' }}
-                            .value=${settings.autoMergeFog}
-                            @change=${this._onSelect('autoMergeFog')}
-                        ></obui-select>
-                    </label>
-                    <obui-help-tooltip>
-                        <p>Only auto-merges with shapes drawn by this extension</p>
-                    </obui-help-tooltip>
-                </div>
+                <label>
+                    <span>Fog</span>
+                    <obui-select
+                        .options=${{ on: 'On', off: 'Off' }}
+                        .value=${settings.autoMergeFog}
+                        @change=${this._onSelect('autoMergeFog')}
+                    ></obui-select>
+                </label>
 
                 <h3>Drawing style</h3>
 
